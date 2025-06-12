@@ -1,10 +1,12 @@
 #pragma once
 
 #include <Metric.h>
+#include "utils/timestamp.h"
 
 #include <memory>
-#include <unordered_map>
+#include <map>
 #include <sstream>
+#include <fstream>
 
 class MetricsWriter {
 public:
@@ -55,10 +57,20 @@ private:
         }
     };
 
-    std::string filename_;
-    std::unordered_map<std::string, std::unique_ptr<MetricWrapper>> metrics_;
-
+private:
     void dumpValues() {
-        // todo
+        std::ofstream file(filename_, std::ios::out | std::ios::app);
+
+        file << getTimestamp();
+
+        for (auto& metric : metrics_) {
+            auto& wrapper = metric.second;
+            file << " \"" << wrapper->getName() << "\" " << wrapper->getStringAndReset();
+        }
+        file << std::endl;
     }
+
+private:
+    const std::string filename_;
+    std::map<std::string, std::unique_ptr<MetricWrapper>> metrics_;
 };

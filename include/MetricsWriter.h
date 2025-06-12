@@ -9,10 +9,18 @@
 #include <fstream>
 #include <thread>
 #include <atomic>
+#include <condition_variable>
 
 class MetricsWriter {
 public:
-    explicit MetricsWriter(std::string filename) : filename_(std::move(filename)), running_(true) {
+    template <typename Rep, typename Period>
+    explicit MetricsWriter(std::string filename, std::chrono::duration<Rep, Period> period)
+    : filename_(std::move(filename)), period_(period), running_(true) {
+        writingThread_ = std::thread(&MetricsWriter::runWriting, this);
+    }
+
+    explicit MetricsWriter(std::string filename)
+    : filename_(std::move(filename)), period_(1), running_(true) {
         writingThread_ = std::thread(&MetricsWriter::runWriting, this);
     }
 
@@ -41,9 +49,8 @@ public:
     void stop() {
         if (running_) {
             running_ = false;
-            if (writingThread_.joinable()) {
-                writingThread_.join();
-            }
+            cv_running_.notify_one();
+            writingThread_.join();
         }
     }
 
@@ -72,9 +79,18 @@ private:
 
 private:
     void runWriting() {
+        std::unique_lock lock(mutex_running_);
+        auto next_wakeup = std::chrono::steady_clock::now() + period_;
         while (running_) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            while (std::chrono::steady_clock::now() < next_wakeup && running_) {
+                cv_running_.wait_until(lock, next_wakeup);
+            }
+            if (!running_) {
+                return;
+            }
+
             dumpValues();
+            next_wakeup += period_;
         }
     }
 
@@ -93,9 +109,13 @@ private:
 
 private:
     const std::string filename_;
+    std::chrono::seconds period_;
     std::map<std::string, std::unique_ptr<MetricWrapper>> metrics_;
 
+    std::condition_variable cv_running_;
+    std::mutex mutex_running_;
     std::atomic<bool> running_;
+
     std::thread writingThread_;
     std::mutex mutex_;
 };

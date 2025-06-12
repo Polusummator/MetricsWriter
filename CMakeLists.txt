@@ -4,6 +4,9 @@ project(metrics-writer)
 
 set(CMAKE_CXX_STANDARD 17)
 
-file(GLOB SRC_LIST src/*.cpp)
-add_executable(${PROJECT_NAME} ${SRC_LIST})
-target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/include)
+add_library(${PROJECT_NAME} INTERFACE)
+target_include_directories(${PROJECT_NAME} INTERFACE ${PROJECT_SOURCE_DIR}/include)
+
+# Examples
+add_executable(cpu_http_example examples/cpu_http_example.cpp)
+target_link_libraries(cpu_http_example ${PROJECT_NAME})

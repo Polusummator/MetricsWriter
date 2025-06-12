@@ -7,10 +7,14 @@
 #include <map>
 #include <sstream>
 #include <fstream>
+#include <thread>
+#include <atomic>
 
 class MetricsWriter {
 public:
-    explicit MetricsWriter(std::string filename) : filename_(std::move(filename)) {}
+    explicit MetricsWriter(std::string filename) : filename_(std::move(filename)), running_(true) {
+        writingThread_ = std::thread(&MetricsWriter::runWriting, this);
+    }
 
     MetricsWriter(const MetricsWriter&) = delete;
     MetricsWriter& operator=(const MetricsWriter&) = delete;
@@ -35,7 +39,12 @@ public:
     }
 
     void stop() {
-        // todo
+        if (running_) {
+            running_ = false;
+            if (writingThread_.joinable()) {
+                writingThread_.join();
+            }
+        }
     }
 
 private:
@@ -56,18 +65,25 @@ private:
 
         std::string getStringAndReset() override {
             std::ostringstream ss;
-            ss << metric_.getValue();
-            metric_.resetValue();
+            ss << metric_.getAndResetValue();
             return ss.str();
         }
     };
 
 private:
+    void runWriting() {
+        while (running_) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            dumpValues();
+        }
+    }
+
     void dumpValues() {
         std::ofstream file(filename_, std::ios::out | std::ios::app);
 
         file << getTimestamp();
 
+        std::lock_guard guard(mutex_);
         for (auto& metric : metrics_) {
             auto& wrapper = metric.second;
             file << " \"" << wrapper->getName() << "\" " << wrapper->getStringAndReset();
@@ -78,4 +94,8 @@ private:
 private:
     const std::string filename_;
     std::map<std::string, std::unique_ptr<MetricWrapper>> metrics_;
+
+    std::atomic<bool> running_;
+    std::thread writingThread_;
+    std::mutex mutex_;
 };

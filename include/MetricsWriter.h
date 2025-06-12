@@ -23,6 +23,11 @@ public:
 
     template <class T>
     Metric<T>& registerMetric(const std::string& name) {
+        if (metrics_.find(name) != metrics_.end()) {
+            throw std::runtime_error("Metric \"" + name + "\" already registered");
+        }
+
+        std::lock_guard guard(mutex_);
         auto wrapper = std::make_unique<MetricWrapperImpl<T>>(name);
         Metric<T>& metric = wrapper->metric_;
         metrics_[name] = std::move(wrapper);

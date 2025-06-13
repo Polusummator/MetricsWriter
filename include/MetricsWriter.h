@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Metric.h>
+#include "Metric.h"
 #include "utils/timestamp.h"
 
 #include <memory>
@@ -14,7 +14,7 @@
 class MetricsWriter {
 public:
     template <typename Rep, typename Period>
-    explicit MetricsWriter(std::string filename, std::chrono::duration<Rep, Period> period)
+    MetricsWriter(std::string filename, std::chrono::duration<Rep, Period> period)
     : filename_(std::move(filename)), period_(period), running_(true) {
         writingThread_ = std::thread(&MetricsWriter::runWriting, this);
     }
@@ -56,7 +56,7 @@ public:
 
 private:
     struct MetricWrapper {
-        virtual std::string getName() = 0;
+        virtual std::string getName() const = 0;
         virtual std::string getStringAndReset() = 0;
     };
 
@@ -66,13 +66,13 @@ private:
 
         explicit MetricWrapperImpl(const std::string& name) : metric_(name) {}
 
-        std::string getName() override {
+        std::string getName() const override {
             return metric_.getName();
         }
 
         std::string getStringAndReset() override {
             std::ostringstream ss;
-            ss << metric_.getAndResetValue();
+            ss << metric_.getAggregatedReset();
             return ss.str();
         }
     };
@@ -109,13 +109,13 @@ private:
 
 private:
     const std::string filename_;
-    std::chrono::seconds period_;
+    const std::chrono::seconds period_;
     std::map<std::string, std::unique_ptr<MetricWrapper>> metrics_;
 
     std::condition_variable cv_running_;
-    std::mutex mutex_running_;
+    mutable std::mutex mutex_running_;
     std::atomic<bool> running_;
 
     std::thread writingThread_;
-    std::mutex mutex_;
+    mutable std::mutex mutex_;
 };

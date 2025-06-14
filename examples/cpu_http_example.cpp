@@ -19,7 +19,7 @@ int main() {
         cpu_metric.setValue(cpu_dist(gen));
         http_metric.setValue(http_dist(gen));
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
     mw.stop(); // Not necessary, destructor calls stop

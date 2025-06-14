@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Metric.h"
+#include "Aggregator.h"
 #include "utils/timestamp.h"
 
 #include <memory>
@@ -33,14 +34,14 @@ public:
         stop();
     }
 
-    template <class T>
-    Metric<T>& registerMetric(const std::string& name) {
+    template <class T, class Aggregator = std::function<T(const std::vector<T>&)>>
+    Metric<T>& registerMetric(const std::string& name, Aggregator aggregator = Aggregators::LastValue<T>) {
         if (metrics_.find(name) != metrics_.end()) {
             throw std::runtime_error("Metric \"" + name + "\" already registered");
         }
 
         std::lock_guard guard(mutex_);
-        auto wrapper = std::make_unique<MetricWrapperImpl<T>>(name);
+        auto wrapper = std::make_unique<MetricWrapperImpl<T, Aggregator>>(name, aggregator);
         Metric<T>& metric = wrapper->metric_;
         metrics_[name] = std::move(wrapper);
         return metric;
@@ -60,11 +61,11 @@ private:
         virtual std::string getStringAndReset() = 0;
     };
 
-    template <class T>
+    template <class T, class Aggregator>
     struct MetricWrapperImpl : MetricWrapper {
         Metric<T> metric_;
 
-        explicit MetricWrapperImpl(const std::string& name) : metric_(name) {}
+        explicit MetricWrapperImpl(const std::string& name, Aggregator aggregator) : metric_(name, aggregator) {}
 
         std::string getName() const override {
             return metric_.getName();
@@ -94,7 +95,7 @@ private:
         }
     }
 
-    void dumpValues() {
+    void dumpValues() const {
         std::ofstream file(filename_, std::ios::out | std::ios::app);
 
         file << getTimestamp();

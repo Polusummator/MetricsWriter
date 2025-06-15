@@ -43,7 +43,7 @@ int main() {
 see full [example](examples/cpu_http_example.cpp)
 
 ### Period
-You can also specify the period for writing to the file.
+You can also specify the period for writing to the file
 
 ```c++
 mw::MetricsWriter mw("metrics.log", std::chrono::seconds(5));
@@ -94,7 +94,7 @@ MetricsWriter dumps metrics' values every `period` seconds and resets aggregated
 
 Aggregator is a function `Value (const std::vector<Value>& values);`, that can be passed in `registerMetric`
 
-There some built-in aggregators:
+There are some built-in aggregators:
 - `LastValue` (default)
 - `Sum`
 - `Avg`

@@ -13,3 +13,6 @@ target_link_libraries(cpu_http_example ${PROJECT_NAME})
 
 add_executable(custom_type_example examples/custom_type_example.cpp)
 target_link_libraries(custom_type_example ${PROJECT_NAME})
+
+add_executable(latency_example examples/latency_example.cpp)
+target_link_libraries(latency_example ${PROJECT_NAME})

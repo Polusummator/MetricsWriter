@@ -22,3 +22,6 @@ target_link_libraries(custom_type_example ${PROJECT_NAME})
 
 add_executable(latency_example examples/latency_example.cpp)
 target_link_libraries(latency_example ${PROJECT_NAME})
+
+add_executable(custom_aggregator_example examples/custom_aggregator_example.cpp)
+target_link_libraries(custom_aggregator_example ${PROJECT_NAME})

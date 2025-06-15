@@ -3,11 +3,11 @@
 #include <random>
 
 int main() {
-    MetricsWriter mw("metrics.log");
+    mw::MetricsWriter mw("metrics.log");
 
-    auto& latency_max_metric = mw.registerMetric<double>("latency_max", Aggregators::Max<double>);
-    auto& latency_min_metric = mw.registerMetric<double>("latency_min", Aggregators::Min<double>);
-    auto& latency_avg_metric = mw.registerMetric<double>("latency_avg", Aggregators::Avg<double>);
+    auto& latency_max_metric = mw.registerMetric<double>("latency_max", mw::Aggregators::Max<double>);
+    auto& latency_min_metric = mw.registerMetric<double>("latency_min", mw::Aggregators::Min<double>);
+    auto& latency_avg_metric = mw.registerMetric<double>("latency_avg", mw::Aggregators::Avg<double>);
 
     std::random_device rd;
     std::mt19937 gen(rd());

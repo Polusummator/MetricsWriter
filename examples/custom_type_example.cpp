@@ -21,7 +21,7 @@ std::ostream& operator<<(std::ostream& out, const MyType& t) {
 }
 
 int main() {
-    MetricsWriter mw("metrics.log");
+    mw::MetricsWriter mw("metrics.log");
 
     auto& metric = mw.registerMetric<MyType>("something");
 

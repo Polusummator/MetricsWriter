@@ -5,7 +5,7 @@
 #include <random>
 
 int main() {
-    MetricsWriter mw("metrics.log");
+    mw::MetricsWriter mw("metrics.log");
 
     auto& diff_metric = mw.registerMetric<int>("diff",
         [](const std::vector<int>& values) {

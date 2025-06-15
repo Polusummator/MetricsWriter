@@ -12,6 +12,8 @@
 #include <atomic>
 #include <condition_variable>
 
+namespace mw {
+
 class MetricsWriter {
 public:
     template <typename Rep, typename Period>
@@ -120,3 +122,5 @@ private:
     std::thread writingThread_;
     mutable std::mutex mutex_;
 };
+
+}

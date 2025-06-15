@@ -5,7 +5,7 @@
 #include <random>
 
 int main() {
-    MetricsWriter mw("metrics.log");
+    mw::MetricsWriter mw("metrics.log");
 
     auto& cpu_metric = mw.registerMetric<double>("CPU");
     auto& http_metric = mw.registerMetric<int>("HTTP requests RPS");

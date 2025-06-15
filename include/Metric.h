@@ -7,6 +7,8 @@
 
 #include <concurrentqueue.h>
 
+namespace mw {
+
 template <class Value, class Aggregator = std::function<Value(const std::vector<Value>&)>>
 class Metric {
     friend class MetricsWriter;
@@ -47,3 +49,5 @@ private:
     mutable std::mutex mutex_;
     moodycamel::ConcurrentQueue<Value> queue_;
 };
+
+}

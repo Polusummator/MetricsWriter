@@ -41,7 +41,7 @@ public:
         }
 
         std::lock_guard guard(mutex_);
-        auto wrapper = std::make_unique<MetricWrapperImpl<T, Aggregator>>(name, aggregator);
+        auto wrapper = std::make_shared<MetricWrapperImpl<T, Aggregator>>(name, aggregator);
         Metric<T>& metric = wrapper->metric_;
         metrics_[name] = std::move(wrapper);
         return metric;
@@ -111,7 +111,7 @@ private:
 private:
     const std::string filename_;
     const std::chrono::seconds period_;
-    std::map<std::string, std::unique_ptr<MetricWrapper>> metrics_;
+    std::map<std::string, std::shared_ptr<MetricWrapper>> metrics_;
 
     std::condition_variable cv_running_;
     mutable std::mutex mutex_running_;

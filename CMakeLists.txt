@@ -4,8 +4,14 @@ project(metrics-writer)
 
 set(CMAKE_CXX_STANDARD 17)
 
+include(FetchContent)
+FetchContent_Declare(queue
+    GIT_REPOSITORY https://github.com/cameron314/concurrentqueue
+)
+FetchContent_MakeAvailable(queue)
+
 add_library(${PROJECT_NAME} INTERFACE)
-target_include_directories(${PROJECT_NAME} INTERFACE ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(${PROJECT_NAME} INTERFACE ${PROJECT_SOURCE_DIR}/include ${queue_SOURCE_DIR})
 
 # Examples
 add_executable(cpu_http_example examples/cpu_http_example.cpp)

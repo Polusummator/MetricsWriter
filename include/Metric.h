@@ -5,6 +5,8 @@
 #include <string>
 #include <utility>
 
+#include <concurrentqueue.h>
+
 template <class Value, class Aggregator = std::function<Value(const std::vector<Value>&)>>
 class Metric {
     friend class MetricsWriter;
@@ -21,24 +23,27 @@ public:
         return name_;
     }
 
-    void setValue(Value value) {
+    void setValue(const Value& value) {
         std::lock_guard guard(mutex_);
         current_value_ = value;
-        values_.push_back(value);
+        queue_.enqueue(value);
     }
 
 private:
     Value getAggregatedReset() {
-        std::lock_guard guard(mutex_);
-        auto result = aggregator_(values_);
-        values_.clear();
-        return result;
+        std::vector<Value> values;
+        Value val;
+        while (queue_.try_dequeue(val)) {
+            values.push_back(val);
+        }
+        return aggregator_(values);
     }
 
 private:
     std::string name_;
-    std::vector<Value> values_;
     Value current_value_;
     Aggregator aggregator_;
+
     mutable std::mutex mutex_;
+    moodycamel::ConcurrentQueue<Value> queue_;
 };

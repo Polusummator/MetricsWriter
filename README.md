@@ -54,8 +54,7 @@ Default value is `1s`. The passed number must be an integer number of seconds (y
 ### Custom types
 
 MetricsWriter works with metrics of any types that have:
-- ctor
-- copy/move operator
+- move support
 - `operator<<`
 
 For example, you can use your own type
@@ -92,7 +91,7 @@ see full [example](examples/custom_type_example.cpp)
 
 MetricsWriter dumps metrics' values every `period` seconds and resets aggregated values. The default aggregation function is simply taking the last value, but you can change this behaviour
 
-Aggregator is a function `Value (const std::vector<Value>& values);`, that can be passed in `registerMetric`
+Aggregator is a function `Value (std::vector<Value>&& values);`, that can be passed in `registerMetric`
 
 There are some built-in aggregators:
 - `LastValue` (default)
@@ -112,7 +111,7 @@ Or you can use your own aggregator
 
 ```c++
 auto& diff_metric = mw.registerMetric<int>("diff",
-        [](const std::vector<int>& values) {
+        [](std::vector<int>&& values) {
             int cnt0 = 0;
             int cnt1 = 0;
             for (int i : values) {

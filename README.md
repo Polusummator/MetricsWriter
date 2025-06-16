@@ -127,6 +127,22 @@ auto& diff_metric = mw.registerMetric<int>("diff",
 ```
 see full [example](examples/custom_aggregator_example.cpp)
 
+## Add to your project
+
+The easiest way to use library is to add it using FetchContent
+
+```cmake
+include(FetchContent)
+FetchContent_Declare(
+    mw
+    GIT_REPOSITORY https://github.com/Polusummator/MetricsWriter.git
+    GIT_TAG main
+)
+FetchContent_MakeAvailable(mw)
+
+target_link_libraries(your_target_name metrics-writer)
+```
+
 ## Build examples
 
 ```shell

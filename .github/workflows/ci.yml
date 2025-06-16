@@ -1,0 +1,89 @@
+name: Build and Sanitize Check
+
+on:
+  push:
+    paths:
+      - ".github/workflows/**"
+      - "include/**"
+      - "examples/**"
+      - "CMakeLists.txt"
+
+jobs:
+  build-default:
+    name: Build default
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential cmake
+
+      - name: Configure CMake
+        run: cmake -DCMAKE_BUILD_TYPE=Release .
+
+      - name: Build
+        run: make
+
+      - name: Run all examples
+        run: |
+          ./latency_example
+          ./cpu_http_example
+          ./custom_type_example
+          ./custom_aggregator_example
+
+  build-asan:
+    name: Build with ASAN
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential cmake
+
+      - name: Configure CMake
+        run: >
+          cmake -DCMAKE_BUILD_TYPE=Debug
+                -DCMAKE_CXX_FLAGS="-fsanitize=address"
+                .
+
+      - name: Build
+        run: make
+
+      - name: Run all examples
+        run: |
+          ASAN_OPTIONS=detect_leaks=1 ./latency_example
+          ASAN_OPTIONS=detect_leaks=1 ./cpu_http_example
+          ASAN_OPTIONS=detect_leaks=1 ./custom_type_example
+          ASAN_OPTIONS=detect_leaks=1 ./custom_aggregator_example
+
+  build-tsan:
+    name: Build with TSAN
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential cmake
+
+      - name: Configure CMake
+        run: >
+          cmake -DCMAKE_BUILD_TYPE=Debug
+                -DCMAKE_CXX_FLAGS="-fsanitize=thread"
+                .
+
+      - name: Build
+        run: make
+
+      - name: Run all examples
+        run: |
+          ./latency_example
+          ./cpu_http_example
+          ./custom_type_example
+          ./custom_aggregator_example

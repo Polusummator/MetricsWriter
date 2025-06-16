@@ -36,7 +36,7 @@ public:
         stop();
     }
 
-    template <class T, class Aggregator = std::function<T(const std::vector<T>&)>>
+    template <class T, class Aggregator = std::function<T(std::vector<T>&&)>>
     Metric<T>& registerMetric(const std::string& name, Aggregator aggregator = Aggregators::LastValue<T>) {
         if (metrics_.find(name) != metrics_.end()) {
             throw std::runtime_error("Metric \"" + name + "\" already registered");

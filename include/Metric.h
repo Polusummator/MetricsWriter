@@ -9,7 +9,7 @@
 
 namespace mw {
 
-template <class Value, class Aggregator = std::function<Value(const std::vector<Value>&)>>
+template <class Value, class Aggregator = std::function<Value(std::vector<Value>&&)>>
 class Metric {
     friend class MetricsWriter;
 public:
@@ -25,10 +25,11 @@ public:
         return name_;
     }
 
-    void setValue(const Value& value) {
+    template <class ValueRef>
+    void setValue(ValueRef&& value) {
         std::lock_guard guard(mutex_);
-        current_value_ = value;
-        queue_.enqueue(value);
+        current_value_ = std::forward<ValueRef>(value);
+        queue_.enqueue(std::forward<ValueRef>(value));
     }
 
 private:
@@ -36,9 +37,9 @@ private:
         std::vector<Value> values;
         Value val;
         while (queue_.try_dequeue(val)) {
-            values.push_back(val);
+            values.push_back(std::move(val));
         }
-        return aggregator_(values);
+        return aggregator_(std::move(values));
     }
 
 private:

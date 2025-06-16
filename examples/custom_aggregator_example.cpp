@@ -8,7 +8,7 @@ int main() {
     mw::MetricsWriter mw("metrics.log");
 
     auto& diff_metric = mw.registerMetric<int>("diff",
-        [](const std::vector<int>& values) {
+        [](std::vector<int>&& values) {
             int cnt0 = 0;
             int cnt1 = 0;
             for (int i : values) {

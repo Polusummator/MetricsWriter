@@ -32,6 +32,7 @@ jobs:
           ./latency_example
           ./cpu_http_example
           ./custom_type_example
+          ./custom_type_move_only_example
           ./custom_aggregator_example
 
   build-asan:
@@ -57,6 +58,7 @@ jobs:
           ASAN_OPTIONS=detect_leaks=1 ./latency_example
           ASAN_OPTIONS=detect_leaks=1 ./cpu_http_example
           ASAN_OPTIONS=detect_leaks=1 ./custom_type_example
+          ASAN_OPTIONS=detect_leaks=1 ./custom_type_move_only_example
           ASAN_OPTIONS=detect_leaks=1 ./custom_aggregator_example
 
   build-tsan:
@@ -82,4 +84,5 @@ jobs:
           ./latency_example
           ./cpu_http_example
           ./custom_type_example
+          ./custom_type_move_only_example
           ./custom_aggregator_example

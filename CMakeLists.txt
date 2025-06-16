@@ -11,7 +11,11 @@ FetchContent_Declare(queue
 FetchContent_MakeAvailable(queue)
 
 add_library(${PROJECT_NAME} INTERFACE)
-target_include_directories(${PROJECT_NAME} INTERFACE ${PROJECT_SOURCE_DIR}/include ${queue_SOURCE_DIR})
+target_include_directories(metrics-writer INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+)
+target_include_directories(${PROJECT_NAME} INTERFACE ${queue_SOURCE_DIR})
 
 # Examples
 add_executable(cpu_http_example examples/cpu_http_example.cpp)

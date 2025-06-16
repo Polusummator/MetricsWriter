@@ -16,9 +16,9 @@ public:
     explicit Metric(std::string name, Aggregator aggregator)
     : name_(std::move(name)), aggregator_(std::move(aggregator)) {}
 
-    Value getValue() const {
+    Value getValue() {
         std::lock_guard guard(mutex_);
-        return current_value_;
+        return std::move(current_value_);
     }
 
     std::string getName() const {

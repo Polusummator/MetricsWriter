@@ -87,6 +87,8 @@ int main() {
 ```
 see full [example](examples/custom_type_example.cpp)
 
+see move-only type [example](examples/custom_type_move_only_example.cpp)
+
 ### Aggregators
 
 MetricsWriter dumps metrics' values every `period` seconds and resets aggregated values. The default aggregation function is simply taking the last value, but you can change this behaviour
@@ -99,6 +101,8 @@ There are some built-in aggregators:
 - `Avg`
 - `Max`
 - `Min`
+
+Note that they do not work for all types, because they require the implementation of certain operators 
 
 ```c++
 auto& latency_max_metric = mw.registerMetric<double>("latency_max", mw::Aggregators::Max<double>);
